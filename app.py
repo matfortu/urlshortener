@@ -2,13 +2,28 @@ from flask import Flask, redirect
 import sqlite3
 import random
 import string
+import os.path
 
 HOST = 'https://matfortu.it'
 
 app = Flask(__name__)
 
+def setup():
+    if not os.path.exists('urls.db'):
+        open('urls.db', 'a').close()
+        db = sqlite3.connect('urls.db')
+        c = db.cursor()
+        c.execute('CREATE TABLE "urls" ("url" TEXT NOT NULL UNIQUE, "short" TEXT NOT NULL UNIQUE, PRIMARY KEY("url"))')
+        db.commit()
+        c.close()
+    return
+
 def new(url):
     short = get_existing(url)
+    try:
+        short = short[0]
+    except:
+        short = ""
     if not short:
         short = get_random_string(4)
         db = sqlite3.connect('urls.db')
@@ -23,7 +38,7 @@ def search(short):
     c = db.cursor()
     c.execute("SELECT url FROM urls WHERE short = ?", [short])
     res = c.fetchone()
-    db.close
+    db.close()
     return res
 
 def get_random_string(length):
@@ -37,8 +52,8 @@ def get_existing(url):
     c = db.cursor()
     c.execute("SELECT short FROM urls WHERE url = ?", [url])
     res = c.fetchone()
-    db.close
-    return res[0]
+    db.close()
+    return res
 
 @app.route('/<short>', methods=['GET'])
 def handle_search(short=None):
@@ -60,3 +75,5 @@ def add(url= None):
         return f'{url} -> <a href="{HOST}/{short}">{HOST}/{short}</a>'
     else:
         return "Invalid URL"
+
+setup()
