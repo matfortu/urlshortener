@@ -70,7 +70,7 @@ def handle_search(short=None):
 @app.route('/add/<url>', methods=['GET'])
 @app.route('/add/<path:url>', methods=['GET'])
 def add(url= None):
-    if url and (url.startswith('http') or url.startswith('https')):
+    if url and (url.startswith('http') or url.startswith('https')) and not 'matfortu.it' in url:
         short = new(url)
         return f'{url} -> <a href="{HOST}/{short}">{HOST}/{short}</a>'
     else:
