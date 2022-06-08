@@ -1,4 +1,4 @@
-from flask import Flask, redirect
+from flask import Flask, redirect, request
 import sqlite3
 import random
 import string
@@ -69,10 +69,11 @@ def handle_search(short=None):
 @app.route('/add/', methods=['GET'])
 @app.route('/add/<url>', methods=['GET'])
 @app.route('/add/<path:url>', methods=['GET'])
-def add(url= None):
+def add(url=None):
+    fp = request.full_path[5:]
     if url and (url.startswith('http') or url.startswith('https')) and not 'matfortu.it' in url:
-        short = new(url)
-        return f'{url} -> <a href="{HOST}/{short}">{HOST}/{short}</a>'
+        short = new(fp)
+        return f'{fp} -> <a href="{HOST}/{short}">{HOST}/{short}</a>'
     else:
         return "Invalid URL"
 
